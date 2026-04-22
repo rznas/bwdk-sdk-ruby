@@ -9,7 +9,6 @@ README.md
 Rakefile
 docs/AuthStatusResponse.md
 docs/BusinessAddress.md
-docs/DefaultApi.md
 docs/DeliveryTimeRangeDisplay.md
 docs/ErrorEnum.md
 docs/GatewayTypeEnum.md
@@ -17,7 +16,9 @@ docs/Merchant.md
 docs/MerchantOrderCancelShipmentResponse.md
 docs/MerchantOrderRefundResponse.md
 docs/MerchantOrderReviveShipmentResponse.md
+docs/MerchantOrdersApi.md
 docs/MerchantPaidOrderList.md
+docs/MerchantWalletApi.md
 docs/NullEnum.md
 docs/Option.md
 docs/OrderCreate.md
@@ -25,6 +26,7 @@ docs/OrderCreateResponse.md
 docs/OrderDetail.md
 docs/OrderError.md
 docs/OrderItemCreate.md
+docs/OrderShippingApi.md
 docs/OrderStatusEnum.md
 docs/OrderUser.md
 docs/Packing.md
@@ -33,6 +35,7 @@ docs/PaginatedOrderDetailList.md
 docs/PaymentOrder.md
 docs/RefundOrder.md
 docs/ReviveShipment.md
+docs/SellerProfileManagementApi.md
 docs/ShippingMethod.md
 docs/ShippingTypeEnum.md
 docs/TypeNameEnum.md
@@ -41,7 +44,10 @@ docs/VerifyOrder.md
 docs/WalletBalance.md
 git_push.sh
 lib/openapi_client.rb
-lib/openapi_client/api/_api.rb
+lib/openapi_client/api/merchant_orders_api.rb
+lib/openapi_client/api/merchant_wallet_api.rb
+lib/openapi_client/api/order_shipping_api.rb
+lib/openapi_client/api/seller_profile_management_api.rb
 lib/openapi_client/api_client.rb
 lib/openapi_client/api_error.rb
 lib/openapi_client/api_model_base.rb
@@ -79,7 +85,10 @@ lib/openapi_client/models/verify_order.rb
 lib/openapi_client/models/wallet_balance.rb
 lib/openapi_client/version.rb
 openapi_client.gemspec
-spec/api/_api_spec.rb
+spec/api/merchant_orders_api_spec.rb
+spec/api/merchant_wallet_api_spec.rb
+spec/api/order_shipping_api_spec.rb
+spec/api/seller_profile_management_api_spec.rb
 spec/models/auth_status_response_spec.rb
 spec/models/business_address_spec.rb
 spec/models/delivery_time_range_display_spec.rb

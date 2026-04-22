@@ -12,8 +12,8 @@
 | **tax_amount** | **Integer** | مبلغ کل مالیات برای این کالا (به تومان) | [optional] |
 | **image_link** | **String** | آدرس تصویر محصول | [optional] |
 | **options** | [**Array&lt;Option&gt;**](Option.md) |  |  |
-| **preparation_time** | **Integer** | زمان آمادهسازی کالا (به روز) | [optional][default to 2] |
-| **weight** | **Float** | وزن کالا (بر حسب گرم) | [optional] |
+| **preparation_time** | **Integer** | Preparation time for the item (in days) | [optional][default to 2] |
+| **weight** | **Float** | Weight of the item (in grams) | [optional] |
 
 ## Example
 

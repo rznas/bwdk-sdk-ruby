@@ -11,10 +11,10 @@
 | **merchant_order_id** | **String** | شناسه منحصر به فرد سفارش در سیستم فروشنده | [readonly] |
 | **status** | [**OrderStatusEnum**](OrderStatusEnum.md) |  | [readonly] |
 | **status_display** | **String** |  | [readonly] |
-| **main_amount** | **Integer** | مجموع قیمت‌های اولیه تمام کالاها بدون تخفیف (به تومان) | [readonly] |
+| **main_amount** | **Integer** | مجموع قیمت اولیه تمام کالاهای سفارش بدون تخفیف (به تومان) | [readonly] |
 | **final_amount** | **Integer** | قیمت نهایی قابل پرداخت توسط مشتری: مبلغ_اصلی - مبلغ_تخفیف + مبلغ_مالیات (به تومان) | [readonly] |
 | **total_paid_amount** | **Integer** | مبلغ کل پرداخت شده توسط کاربر: مبلغ_نهایی + هزینه_ارسال (به تومان) | [readonly] |
-| **discount_amount** | **Integer** | کل تخفیف اعمال شده بر سفارش (به تومان) | [readonly] |
+| **discount_amount** | **Integer** | مبلغ کل تخفیف اعمال شده بر سفارش (به تومان) | [readonly] |
 | **tax_amount** | **Integer** | مبلغ کل مالیات برای سفارش (به تومان) | [readonly] |
 | **shipping_amount** | **Integer** | هزینه ارسال برای سفارش (به تومان) | [readonly] |
 | **loyalty_amount** | **Integer** | مقدار تخفیف از برنامه باشگاه مشتریان/پاداش (به تومان) | [readonly] |
@@ -36,14 +36,14 @@
 | **is_paid** | **Boolean** |  | [readonly] |
 | **user** | [**OrderUser**](OrderUser.md) |  | [readonly] |
 | **payment** | [**PaymentOrder**](PaymentOrder.md) |  | [readonly] |
-| **preparation_time** | **Integer** | زمان آمادهسازی سفارش (به روز) | [readonly] |
-| **weight** | **Float** | وزن کل سفارش (بر حسب گرم) | [readonly] |
+| **preparation_time** | **Integer** | Preparation time for the order (in days) | [readonly] |
+| **weight** | **Float** | Total weight of the order (in grams) | [readonly] |
 | **selected_shipping_data** | **Hash&lt;String, Object&gt;** |  | [readonly] |
-| **reference_code** | **String** | کد مرجع منحصر به فرد برای پیگیری سفارش مشتری (فرمت: BD-XXXXXXXX) | [readonly] |
+| **reference_code** | **String** | کد مرجع یکتا برای پیگیری سفارش مشتری (قالب: BD-XXXXXXXX) | [readonly] |
 | **promotion_discount_amount** | **Float** |  | [readonly] |
 | **promotion_data** | **Hash&lt;String, Object&gt;** |  | [readonly] |
-| **digipay_markup_amount** | **Integer** | مبلغ نشانه‌گذاری برای سفارش (به تومان) | [readonly] |
-| **markup_commission_percentage** | **Integer** | درصد کمیسیون نشانه‌گذاری برای سفارش (به درصد) | [readonly] |
+| **digipay_markup_amount** | **Integer** | Markup amount for the order (in Tomans) | [readonly] |
+| **markup_commission_percentage** | **Integer** | Markup commission percentage for the order (in percent) | [readonly] |
 | **previous_status** | [**OrderStatusEnum**](OrderStatusEnum.md) |  | [readonly] |
 | **previous_status_display** | **String** |  | [readonly] |
 

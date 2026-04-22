@@ -4,7 +4,7 @@
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **reason** | **String** | دلیل اختیاری برای بازگرداندن وجه | [optional] |
+| **reason** | **String** | Optional reason for the refund | [optional] |
 
 ## Example
 

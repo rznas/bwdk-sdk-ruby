@@ -20,9 +20,9 @@
 | **source_address** | **Object** | مقدار توسط سیستم جایگذاری می شود | [optional] |
 | **user** | **Integer** |  | [readonly] |
 | **reservation_expired_at** | **Integer** | مهلت پرداخت (به عنوان Unix timestamp) قبل از اتمام سفارش | [optional] |
-| **reference_code** | **String** | کد مرجع منحصر به فرد برای پیگیری سفارش مشتری (فرمت: BD-XXXXXXXX) | [readonly] |
-| **preparation_time** | **Integer** | زمان آمادهسازی سفارش (به روز) | [optional][default to 2] |
-| **weight** | **Float** | وزن کل سفارش (بر حسب گرم) | [optional] |
+| **reference_code** | **String** | کد مرجع یکتا برای پیگیری سفارش مشتری (قالب: BD-XXXXXXXX) | [readonly] |
+| **preparation_time** | **Integer** | Preparation time for the order (in days) | [optional][default to 2] |
+| **weight** | **Float** | Total Weight of the order (in grams) | [optional] |
 
 ## Example
 

@@ -4,7 +4,7 @@
 
 | Name | Type | Description | Notes |
 | ---- | ---- | ----------- | ----- |
-| **preparation_time** | **Integer** | زمان آمادهسازی سفارش (به روز) | [optional] |
+| **preparation_time** | **Integer** | The preparation time for the order in days. | [optional] |
 
 ## Example
 
