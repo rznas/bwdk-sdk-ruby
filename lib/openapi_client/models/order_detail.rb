@@ -1,0 +1,1176 @@
+=begin
+#BWDK API
+
+#<div dir=\"rtl\" style=\"text-align: right;\">  # مستندات فروشندگان در سرویس خرید با دیجی‌کالا  این پلتفرم برای فروشندگان (مرچنت‌ها) جهت یکپارچه‌سازی خدمات پرداخت و تجارت الکترونیکی با سیستم خرید با دیجی‌کالا. شامل مدیریت سفارشات، ارسال، و احراز هویت فروشندگان است.     ```mermaid flowchart TD     START([شروع]) --> INITIAL      INITIAL[\"1️⃣ INITIAL\\nسفارش ایجاد شد\"]     STARTED[\"2️⃣ STARTED\\nمشتری به BWDK هدایت شد\"]     PENDING[\"3️⃣ PENDING\\nمشتری وارد شد و سفارش در انتظار پرداخت\"]     WAITING_FOR_GATEWAY[\"4️⃣ WAITING_FOR_GATEWAY\\nمشتری به درگاه پرداخت هدایت شد\"]     PAID_BY_USER[\"7️⃣ PAID_BY_USER\\nپرداخت موفق\"]     VERIFIED_BY_MERCHANT[\"9️⃣ VERIFIED_BY_MERCHANT\\nتأیید شده توسط فروشنده\"]     SHIPPED[\"🚚 SHIPPED\\nارسال شد\"]     DELIVERED[\"✅ DELIVERED\\nتحویل داده شد\"]      EXPIRED[\"⏰ EXPIRED\\nمنقضی شد\"]     EXPIRATION_TIME_EXCEEDED[\"⏱️ EXPIRATION_TIME_EXCEEDED\\nزمان انقضا گذشت\"]     CANCELLED[\"❌ CANCELLED\\nلغو توسط مشتری\"]     FAILED_TO_PAY[\"💳 FAILED_TO_PAY\\nپرداخت ناموفق\"]     FAILED_TO_VERIFY_BY_MERCHANT[\"🔴 FAILED_TO_VERIFY_BY_MERCHANT\\nتأیید مرچنت ناموفق\"]     FAILED_BY_MERCHANT[\"🔴 FAILED_BY_MERCHANT\\nخطا از سمت مرچنت\"]     CANCELLED_BY_MERCHANT[\"🔴 CANCELLED_BY_MERCHANT\\nلغو توسط مرچنت\"]      R_CUSTOMER_REQUEST[\"1️⃣3️⃣ REQUEST_TO_REFUND\\nدرخواست استرداد توسط مشتری\"]     R_FAILED_VERIFY[\"1️⃣4️⃣ REQUEST_TO_REFUND\\nاسترداد پس از تأیید ناموفق مرچنت\"]     R_FAILED_MERCHANT[\"1️⃣5️⃣ REQUEST_TO_REFUND\\nاسترداد پس از خطای مرچنت\"]     R_CANCELLED_MERCHANT[\"1️⃣6️⃣ REQUEST_TO_REFUND\\nاسترداد پس از لغو مرچنت\"]     REFUND_COMPLETED[\"✅ REFUND_COMPLETED\\nاسترداد تکمیل شد\"]      INITIAL -->|\"مرچنت سفارش ایجاد کرد\"| STARTED     STARTED -->|\"مشتری وارد سیستم شد\"| PENDING     PENDING -->|\"مشتری سفارش را نهایی و ثبت کرد\"| WAITING_FOR_GATEWAY     WAITING_FOR_GATEWAY -->|\"پرداخت با موفقیت انجام شد\"| PAID_BY_USER     PAID_BY_USER -->|\"مرچنت سفارش را تأیید کرد\"| VERIFIED_BY_MERCHANT     VERIFIED_BY_MERCHANT -->|\"مرچنت وضعیت را به ارسال تغییر داد\"| SHIPPED     SHIPPED -->|\"مرچنت تحویل را تأیید کرد\"| DELIVERED      INITIAL -->|\"زمان رزرو به پایان رسید\"| EXPIRED     STARTED -->|\"زمان رزرو به پایان رسید\"| EXPIRED     PENDING -->|\"زمان رزرو به پایان رسید\"| EXPIRED     WAITING_FOR_GATEWAY -->|\"زمان رزرو به پایان رسید\"| EXPIRED      PENDING -->|\"زمان مجاز سفارش سپری شده بود\"| EXPIRATION_TIME_EXCEEDED     WAITING_FOR_GATEWAY -->|\"زمان مجاز سفارش سپری شده بود\"| EXPIRATION_TIME_EXCEEDED      PENDING -->|\"مشتری انصراف داد\"| CANCELLED     WAITING_FOR_GATEWAY -->|\"مشتری انصراف داد\"| CANCELLED      WAITING_FOR_GATEWAY -->|\"پرداخت ناموفق بود\"| FAILED_TO_PAY      PAID_BY_USER -->|\"مرچنت تأیید را رد کرد\"| FAILED_TO_VERIFY_BY_MERCHANT     PAID_BY_USER -->|\"مرچنت اعلام ناتوانی در انجام سفارش کرد\"| FAILED_BY_MERCHANT     PAID_BY_USER -->|\"مرچنت سفارش را لغو کرد\"| CANCELLED_BY_MERCHANT     VERIFIED_BY_MERCHANT -->|\"مرچنت سفارش را لغو کرد\"| CANCELLED_BY_MERCHANT      PAID_BY_USER -->|\"مرچنت درخواست استرداد داد\"| R_CUSTOMER_REQUEST     VERIFIED_BY_MERCHANT -->|\"مرچنت درخواست استرداد داد\"| R_CUSTOMER_REQUEST     FAILED_TO_VERIFY_BY_MERCHANT -->|\"سیستم استرداد را آغاز کرد\"| R_FAILED_VERIFY     FAILED_BY_MERCHANT -->|\"سیستم استرداد را آغاز کرد\"| R_FAILED_MERCHANT     CANCELLED_BY_MERCHANT -->|\"سیستم استرداد را آغاز کرد\"| R_CANCELLED_MERCHANT      R_CUSTOMER_REQUEST -->|\"استرداد توسط دیجی‌پی تأیید شد\"| REFUND_COMPLETED     R_FAILED_VERIFY -->|\"استرداد توسط دیجی‌پی تأیید شد\"| REFUND_COMPLETED     R_FAILED_MERCHANT -->|\"استرداد توسط دیجی‌پی تأیید شد\"| REFUND_COMPLETED     R_CANCELLED_MERCHANT -->|\"استرداد توسط دیجی‌پی تأیید شد\"| REFUND_COMPLETED      style INITIAL fill:#9e9e9e,color:#fff     style STARTED fill:#1565c0,color:#fff     style PENDING fill:#ef6c00,color:#fff     style WAITING_FOR_GATEWAY fill:#6a1b9a,color:#fff     style PAID_BY_USER fill:#2e7d32,color:#fff     style VERIFIED_BY_MERCHANT fill:#1b5e20,color:#fff     style SHIPPED fill:#0277bd,color:#fff     style DELIVERED fill:#1b5e20,color:#fff     style EXPIRED fill:#b71c1c,color:#fff     style EXPIRATION_TIME_EXCEEDED fill:#b71c1c,color:#fff     style CANCELLED fill:#7f0000,color:#fff     style FAILED_TO_PAY fill:#b71c1c,color:#fff     style FAILED_TO_VERIFY_BY_MERCHANT fill:#b71c1c,color:#fff     style FAILED_BY_MERCHANT fill:#b71c1c,color:#fff     style CANCELLED_BY_MERCHANT fill:#7f0000,color:#fff     style R_CUSTOMER_REQUEST fill:#e65100,color:#fff     style R_FAILED_VERIFY fill:#e65100,color:#fff     style R_FAILED_MERCHANT fill:#e65100,color:#fff     style R_CANCELLED_MERCHANT fill:#e65100,color:#fff     style REFUND_COMPLETED fill:#2e7d32,color:#fff ```  ---  <div dir=\"rtl\" style=\"text-align: right;\">  ## توضیح وضعیت‌های سفارش  ### ۱. INITIAL — ایجاد اولیه سفارش  **معنا:** سفارش توسط بک‌اند مرچنت ساخته شده ولی هنوز هیچ کاربری به آن اختصاص داده نشده است.  **چگونه اتفاق می‌افتد:** مرچنت با ارسال درخواست `POST /api/v1/orders/create` و ارائه اطلاعات کالاها، مبلغ و `callback_url`، یک سفارش جدید ایجاد می‌کند. BWDK یک `order_uuid` منحصربه‌فرد و لینک شروع سفارش (`order_start_url`) برمی‌گرداند.  **وابستگی‌ها:** نیازی به کاربر یا پرداخت ندارد. فقط اطلاعات کالا از سمت مرچنت کافی است.  ---  ### ۲. STARTED — آغاز جریان خرید  **معنا:** مشتری روی لینک شروع سفارش کلیک کرده و وارد محیط BWDK شده است، اما هنوز لاگین نکرده.  **چگونه اتفاق می‌افتد:** وقتی مشتری به `order_start_url` هدایت می‌شود، BWDK وضعیت سفارش را از `INITIAL` به `STARTED` تغییر می‌دهد. در این مرحله فرآیند احراز هویت (SSO) آغاز می‌شود.  **وابستگی‌ها:** مشتری باید به لینک شروع هدایت شده باشد.  ---  ### ۳. PENDING — انتظار برای تکمیل سفارش  **معنا:** مشتری با موفقیت وارد سیستم شده و سفارش به حساب او اختصاص یافته. مشتری در حال انتخاب آدرس، روش ارسال، بسته‌بندی یا تخفیف است.  **چگونه اتفاق می‌افتد:** پس از تکمیل ورود به سیستم (SSO)، BWDK سفارش را به کاربر وصل کرده و وضعیت را به `PENDING` تغییر می‌دهد.  **وابستگی‌ها:** ورود موفق کاربر به سیستم (SSO). در این مرحله مشتری می‌تواند آدرس، شیپینگ، پکینگ و تخفیف را انتخاب کند.  ---  ### ۴. WAITING_FOR_GATEWAY — انتظار برای پرداخت  **معنا:** مشتری اطلاعات سفارش را تأیید کرده و به درگاه پرداخت هدایت شده است.  **چگونه اتفاق می‌افتد:** مشتری دکمه «پرداخت» را می‌زند (`POST /api/v1/orders/submit`)، سیستم یک رکورد پرداخت ایجاد می‌کند و کاربر به درگاه Digipay هدایت می‌شود. وضعیت سفارش به `WAITING_FOR_GATEWAY` تغییر می‌کند.  **وابستگی‌ها:** انتخاب آدرس، روش ارسال و بسته‌بندی الزامی است. پرداخت باید ایجاد شده باشد.  ---  ### ۷. PAID_BY_USER — پرداخت موفق  **معنا:** تراکنش پرداخت با موفقیت انجام شده و وجه از حساب مشتری کسر شده است.  **چگونه اتفاق می‌افتد:** درگاه پرداخت نتیجه موفق را به BWDK اطلاع می‌دهد. سیستم پرداخت را تأیید و وضعیت سفارش را به `PAID_BY_USER` تغییر می‌دهد. در این لحظه مشتری به `callback_url` مرچنت هدایت می‌شود.  **وابستگی‌ها:** تأیید موفق تراکنش از سوی درگاه پرداخت (Digipay).  ---  ### ۹. VERIFIED_BY_MERCHANT — تأیید توسط مرچنت  **معنا:** مرچنت سفارش را بررسی کرده و موجودی کالا و صحت اطلاعات را تأیید نموده است. سفارش آماده ارسال است.  **چگونه اتفاق می‌افتد:** مرچنت با ارسال درخواست `POST /api/v1/orders/manager/{uuid}/verify` سفارش را تأیید می‌کند. این مرحله **اجباری** است و باید پس از پرداخت موفق انجام شود.  **وابستگی‌ها:** سفارش باید در وضعیت `PAID_BY_USER` باشد. مرچنت باید موجودی کالا را بررسی کند.  ---  ### ۲۰. SHIPPED — ارسال شد  **معنا:** سفارش از انبار خارج شده و در حال ارسال به مشتری است.  **چگونه اتفاق می‌افتد:** مرچنت پس از ارسال کالا، وضعیت سفارش را از طریق API به `SHIPPED` تغییر می‌دهد.  **وابستگی‌ها:** سفارش باید در وضعیت `VERIFIED_BY_MERCHANT` باشد.  ---  ### ۱۹. DELIVERED — تحویل داده شد  **معنا:** سفارش به دست مشتری رسیده و فرآیند خرید به پایان رسیده است.  **چگونه اتفاق می‌افتد:** مرچنت پس از تحویل موفق، وضعیت را به `DELIVERED` تغییر می‌دهد.  **وابستگی‌ها:** سفارش باید در وضعیت `SHIPPED` باشد.  ---  ### ۵. EXPIRED — منقضی شد  **معنا:** زمان رزرو سفارش به پایان رسیده و سفارش به صورت خودکار لغو شده است.  **چگونه اتفاق می‌افتد:** یک Task دوره‌ای به طور خودکار سفارش‌هایی که `reservation_expired_at` آن‌ها گذشته را پیدا کرده و وضعیتشان را به `EXPIRED` تغییر می‌دهد. این مکانیزم مانع بلوکه شدن موجودی کالا می‌شود.  **وابستگی‌ها:** سفارش باید در یکی از وضعیت‌های `INITIAL`، `STARTED`، `PENDING` یا `WAITING_FOR_GATEWAY` باشد و زمان رزرو آن گذشته باشد.  ---  ### ۱۸. EXPIRATION_TIME_EXCEEDED — زمان انقضا گذشت  **معنا:** در لحظه ثبت نهایی یا پرداخت، مشخص شد که زمان مجاز سفارش تمام شده است.  **چگونه اتفاق می‌افتد:** هنگام ارسال درخواست پرداخت (`submit_order`)، سیستم بررسی می‌کند که `expiration_time` سفارش هنوز معتبر است یا خیر. در صورت گذشتن زمان، وضعیت به `EXPIRATION_TIME_EXCEEDED` تغییر می‌کند.  **وابستگی‌ها:** سفارش در وضعیت `PENDING` یا `WAITING_FOR_GATEWAY` است و فیلد `expiration_time` سپری شده.  ---  ### ۶. CANCELLED — لغو توسط مشتری  **معنا:** مشتری در حین فرآیند خرید (قبل از پرداخت) سفارش را لغو کرده یا از صفحه خارج شده است.  **چگونه اتفاق می‌افتد:** مشتری در صفحه checkout دکمه «انصراف» را می‌زند یا پرداخت ناموفق بوده و سفارش به حالت لغو درمی‌آید.  **وابستگی‌ها:** سفارش باید در وضعیت `PENDING` یا `WAITING_FOR_GATEWAY` باشد. پرداختی انجام نشده است.  ---  ### ۸. FAILED_TO_PAY — پرداخت ناموفق  **معنا:** تراکنش پرداخت انجام نشد یا با خطا مواجه شد.  **چگونه اتفاق می‌افتد:** درگاه پرداخت نتیجه ناموفق برمی‌گرداند یا فرآیند بازگشت وجه در مرحله پرداخت با شکست مواجه می‌شود.  **وابستگی‌ها:** سفارش باید در وضعیت `WAITING_FOR_GATEWAY` بوده باشد.  ---  ### ۱۰. FAILED_TO_VERIFY_BY_MERCHANT — تأیید ناموفق توسط مرچنت  **معنا:** مرچنت سفارش را رد کرده است؛ معمولاً به دلیل ناموجود بودن کالا یا مغایرت اطلاعات.  **چگونه اتفاق می‌افتد:** مرچنت در پاسخ به درخواست verify، خطا برمی‌گرداند یا API آن وضعیت ناموفق تنظیم می‌کند. پس از این وضعیت، فرآیند استرداد وجه آغاز می‌شود.  **وابستگی‌ها:** سفارش باید در وضعیت `PAID_BY_USER` باشد.  ---  ### ۱۱. FAILED_BY_MERCHANT — خطا از سمت مرچنت  **معنا:** مرچنت پس از تأیید اولیه، اعلام می‌کند که قادر به انجام سفارش نیست (مثلاً به دلیل اتمام موجودی).  **چگونه اتفاق می‌افتد:** مرچنت وضعیت را به `FAILED_BY_MERCHANT` تغییر می‌دهد. وجه پرداختی مشتری مسترد خواهد شد.  **وابستگی‌ها:** سفارش باید در وضعیت `PAID_BY_USER` باشد.  ---  ### ۱۲. CANCELLED_BY_MERCHANT — لغو توسط مرچنت  **معنا:** مرچنت پس از پرداخت، سفارش را به هر دلیلی لغو کرده است.  **چگونه اتفاق می‌افتد:** مرچنت درخواست لغو سفارش را ارسال می‌کند. وجه پرداختی مشتری به او بازگردانده می‌شود.  **وابستگی‌ها:** سفارش باید در وضعیت `PAID_BY_USER` یا `VERIFIED_BY_MERCHANT` باشد.  ---  ### ۱۳. REQUEST_TO_REFUND — درخواست استرداد توسط مشتری  **معنا:** مشتری درخواست بازگشت وجه داده و سیستم در حال پردازش استرداد است.  **چگونه اتفاق می‌افتد:** مرچنت از طریق API درخواست استرداد را ثبت می‌کند (`POST /api/v1/orders/manager/{uuid}/refund`). سفارش وارد صف پردازش استرداد می‌شود.  **وابستگی‌ها:** سفارش باید در وضعیت `PAID_BY_USER` یا `VERIFIED_BY_MERCHANT` باشد.  ---  ### ۱۴، ۱۵، ۱۶. سایر وضعیت‌های درخواست استرداد  این وضعیت‌ها بر اساس دلیل استرداد از هم تفکیک می‌شوند:  - **۱۴ — REQUEST_TO_REFUND_TO_MERCHANT_AFTER_FAILED_TO_VERIFY:** استرداد پس از ناموفق بودن تأیید مرچنت؛ وجه به حساب مرچنت بازمی‌گردد. - **۱۵ — REQUEST_TO_REFUND_TO_CUSTOMER_AFTER_FAILED_BY_MERCHANT:** استرداد پس از خطای مرچنت؛ وجه به مشتری بازمی‌گردد. - **۱۶ — REQUEST_TO_REFUND_TO_MERCHANT_AFTER_CANCELLED_BY_MERCHANT:** استرداد پس از لغو توسط مرچنت؛ وجه به حساب مرچنت برمی‌گردد.  **چگونه اتفاق می‌افتد:** به صورت خودکار پس از رسیدن به وضعیت‌های ناموفق/لغو مربوطه توسط سیستم تنظیم می‌شود.  ---  ### ۱۷. REFUND_COMPLETED — استرداد تکمیل شد  **معنا:** وجه با موفقیت به صاحب آن (مشتری یا مرچنت بسته به نوع استرداد) بازگردانده شده است.  **چگونه اتفاق می‌افتد:** Task پردازش استرداد (`process_order_refund`) پس از تأیید موفق بازگشت وجه از سوی Digipay، وضعیت سفارش را به `REFUND_COMPLETED` تغییر می‌دهد.  **وابستگی‌ها:** یکی از وضعیت‌های درخواست استرداد (۱۳، ۱۴، ۱۵ یا ۱۶) باید فعال باشد و Digipay تراکنش استرداد را تأیید کرده باشد.  </div> 
+
+The version of the OpenAPI document: 1.0.0
+
+Generated by: https://openapi-generator.tech
+Generator version: 7.21.0
+
+=end
+
+require 'date'
+require 'time'
+
+module OpenapiClient
+  class OrderDetail < ApiModelBase
+    attr_accessor :id
+
+    attr_accessor :created_at
+
+    attr_accessor :order_uuid
+
+    # Unix timestamp تا زمانی که سفارش برای پرداخت رزرو شده است
+    attr_accessor :reservation_expired_at
+
+    # شناسه منحصر به فرد سفارش در سیستم فروشنده
+    attr_accessor :merchant_order_id
+
+    attr_accessor :status
+
+    attr_accessor :status_display
+
+    # مجموع قیمت‌های اولیه تمام کالاها بدون تخفیف (به تومان)
+    attr_accessor :main_amount
+
+    # قیمت نهایی قابل پرداخت توسط مشتری: مبلغ_اصلی - مبلغ_تخفیف + مبلغ_مالیات (به تومان)
+    attr_accessor :final_amount
+
+    # مبلغ کل پرداخت شده توسط کاربر: مبلغ_نهایی + هزینه_ارسال (به تومان)
+    attr_accessor :total_paid_amount
+
+    # کل تخفیف اعمال شده بر سفارش (به تومان)
+    attr_accessor :discount_amount
+
+    # مبلغ کل مالیات برای سفارش (به تومان)
+    attr_accessor :tax_amount
+
+    # هزینه ارسال برای سفارش (به تومان)
+    attr_accessor :shipping_amount
+
+    # مقدار تخفیف از برنامه باشگاه مشتریان/پاداش (به تومان)
+    attr_accessor :loyalty_amount
+
+    # آدرسی برای دریافت اطلاع رسانی وضعیت پرداخت پس از تکمیل سفارش
+    attr_accessor :callback_url
+
+    attr_accessor :merchant
+
+    attr_accessor :items
+
+    attr_accessor :source_address
+
+    attr_accessor :destination_address
+
+    attr_accessor :selected_shipping_method
+
+    attr_accessor :shipping_selected_at
+
+    attr_accessor :address_selected_at
+
+    # هزینه روش بسته‌بندی انتخاب‌شده (به تومان)
+    attr_accessor :packing_amount
+
+    attr_accessor :packing_selected_at
+
+    attr_accessor :selected_packing
+
+    attr_accessor :can_select_packing
+
+    attr_accessor :can_select_shipping
+
+    attr_accessor :can_select_address
+
+    attr_accessor :can_proceed_to_payment
+
+    attr_accessor :is_paid
+
+    attr_accessor :user
+
+    attr_accessor :payment
+
+    # زمان آمادهسازی سفارش (به روز)
+    attr_accessor :preparation_time
+
+    # وزن کل سفارش (بر حسب گرم)
+    attr_accessor :weight
+
+    attr_accessor :selected_shipping_data
+
+    # کد مرجع منحصر به فرد برای پیگیری سفارش مشتری (فرمت: BD-XXXXXXXX)
+    attr_accessor :reference_code
+
+    attr_accessor :promotion_discount_amount
+
+    attr_accessor :promotion_data
+
+    # مبلغ نشانه‌گذاری برای سفارش (به تومان)
+    attr_accessor :digipay_markup_amount
+
+    # درصد کمیسیون نشانه‌گذاری برای سفارش (به درصد)
+    attr_accessor :markup_commission_percentage
+
+    attr_accessor :previous_status
+
+    attr_accessor :previous_status_display
+
+    class EnumAttributeValidator
+      attr_reader :datatype
+      attr_reader :allowable_values
+
+      def initialize(datatype, allowable_values)
+        @allowable_values = allowable_values.map do |value|
+          case datatype.to_s
+          when /Integer/i
+            value.to_i
+          when /Float/i
+            value.to_f
+          else
+            value
+          end
+        end
+      end
+
+      def valid?(value)
+        !value || allowable_values.include?(value)
+      end
+    end
+
+    # Attribute mapping from ruby-style variable name to JSON key.
+    def self.attribute_map
+      {
+        :'id' => :'id',
+        :'created_at' => :'created_at',
+        :'order_uuid' => :'order_uuid',
+        :'reservation_expired_at' => :'reservation_expired_at',
+        :'merchant_order_id' => :'merchant_order_id',
+        :'status' => :'status',
+        :'status_display' => :'status_display',
+        :'main_amount' => :'main_amount',
+        :'final_amount' => :'final_amount',
+        :'total_paid_amount' => :'total_paid_amount',
+        :'discount_amount' => :'discount_amount',
+        :'tax_amount' => :'tax_amount',
+        :'shipping_amount' => :'shipping_amount',
+        :'loyalty_amount' => :'loyalty_amount',
+        :'callback_url' => :'callback_url',
+        :'merchant' => :'merchant',
+        :'items' => :'items',
+        :'source_address' => :'source_address',
+        :'destination_address' => :'destination_address',
+        :'selected_shipping_method' => :'selected_shipping_method',
+        :'shipping_selected_at' => :'shipping_selected_at',
+        :'address_selected_at' => :'address_selected_at',
+        :'packing_amount' => :'packing_amount',
+        :'packing_selected_at' => :'packing_selected_at',
+        :'selected_packing' => :'selected_packing',
+        :'can_select_packing' => :'can_select_packing',
+        :'can_select_shipping' => :'can_select_shipping',
+        :'can_select_address' => :'can_select_address',
+        :'can_proceed_to_payment' => :'can_proceed_to_payment',
+        :'is_paid' => :'is_paid',
+        :'user' => :'user',
+        :'payment' => :'payment',
+        :'preparation_time' => :'preparation_time',
+        :'weight' => :'weight',
+        :'selected_shipping_data' => :'selected_shipping_data',
+        :'reference_code' => :'reference_code',
+        :'promotion_discount_amount' => :'promotion_discount_amount',
+        :'promotion_data' => :'promotion_data',
+        :'digipay_markup_amount' => :'digipay_markup_amount',
+        :'markup_commission_percentage' => :'markup_commission_percentage',
+        :'previous_status' => :'previous_status',
+        :'previous_status_display' => :'previous_status_display'
+      }
+    end
+
+    # Returns attribute mapping this model knows about
+    def self.acceptable_attribute_map
+      attribute_map
+    end
+
+    # Returns all the JSON keys this model knows about
+    def self.acceptable_attributes
+      acceptable_attribute_map.values
+    end
+
+    # Attribute type mapping.
+    def self.openapi_types
+      {
+        :'id' => :'Integer',
+        :'created_at' => :'Time',
+        :'order_uuid' => :'String',
+        :'reservation_expired_at' => :'Integer',
+        :'merchant_order_id' => :'String',
+        :'status' => :'OrderStatusEnum',
+        :'status_display' => :'String',
+        :'main_amount' => :'Integer',
+        :'final_amount' => :'Integer',
+        :'total_paid_amount' => :'Integer',
+        :'discount_amount' => :'Integer',
+        :'tax_amount' => :'Integer',
+        :'shipping_amount' => :'Integer',
+        :'loyalty_amount' => :'Integer',
+        :'callback_url' => :'String',
+        :'merchant' => :'Merchant',
+        :'items' => :'Array<OrderItemCreate>',
+        :'source_address' => :'Object',
+        :'destination_address' => :'Object',
+        :'selected_shipping_method' => :'ShippingMethod',
+        :'shipping_selected_at' => :'Time',
+        :'address_selected_at' => :'Time',
+        :'packing_amount' => :'Integer',
+        :'packing_selected_at' => :'Time',
+        :'selected_packing' => :'Packing',
+        :'can_select_packing' => :'Boolean',
+        :'can_select_shipping' => :'Boolean',
+        :'can_select_address' => :'Boolean',
+        :'can_proceed_to_payment' => :'Boolean',
+        :'is_paid' => :'Boolean',
+        :'user' => :'OrderUser',
+        :'payment' => :'PaymentOrder',
+        :'preparation_time' => :'Integer',
+        :'weight' => :'Float',
+        :'selected_shipping_data' => :'Hash<String, Object>',
+        :'reference_code' => :'String',
+        :'promotion_discount_amount' => :'Float',
+        :'promotion_data' => :'Hash<String, Object>',
+        :'digipay_markup_amount' => :'Integer',
+        :'markup_commission_percentage' => :'Integer',
+        :'previous_status' => :'OrderStatusEnum',
+        :'previous_status_display' => :'String'
+      }
+    end
+
+    # List of attributes with nullable: true
+    def self.openapi_nullable
+      Set.new([
+        :'reservation_expired_at',
+        :'source_address',
+        :'destination_address',
+        :'shipping_selected_at',
+        :'address_selected_at',
+        :'packing_selected_at',
+        :'previous_status',
+      ])
+    end
+
+    # Initializes the object
+    # @param [Hash] attributes Model attributes in the form of hash
+    def initialize(attributes = {})
+      if (!attributes.is_a?(Hash))
+        fail ArgumentError, "The input argument (attributes) must be a hash in `OpenapiClient::OrderDetail` initialize method"
+      end
+
+      # check to see if the attribute exists and convert string to symbol for hash key
+      acceptable_attribute_map = self.class.acceptable_attribute_map
+      attributes = attributes.each_with_object({}) { |(k, v), h|
+        if (!acceptable_attribute_map.key?(k.to_sym))
+          fail ArgumentError, "`#{k}` is not a valid attribute in `OpenapiClient::OrderDetail`. Please check the name to make sure it's valid. List of attributes: " + acceptable_attribute_map.keys.inspect
+        end
+        h[k.to_sym] = v
+      }
+
+      if attributes.key?(:'id')
+        self.id = attributes[:'id']
+      else
+        self.id = nil
+      end
+
+      if attributes.key?(:'created_at')
+        self.created_at = attributes[:'created_at']
+      else
+        self.created_at = nil
+      end
+
+      if attributes.key?(:'order_uuid')
+        self.order_uuid = attributes[:'order_uuid']
+      else
+        self.order_uuid = nil
+      end
+
+      if attributes.key?(:'reservation_expired_at')
+        self.reservation_expired_at = attributes[:'reservation_expired_at']
+      else
+        self.reservation_expired_at = nil
+      end
+
+      if attributes.key?(:'merchant_order_id')
+        self.merchant_order_id = attributes[:'merchant_order_id']
+      else
+        self.merchant_order_id = nil
+      end
+
+      if attributes.key?(:'status')
+        self.status = attributes[:'status']
+      else
+        self.status = nil
+      end
+
+      if attributes.key?(:'status_display')
+        self.status_display = attributes[:'status_display']
+      else
+        self.status_display = nil
+      end
+
+      if attributes.key?(:'main_amount')
+        self.main_amount = attributes[:'main_amount']
+      else
+        self.main_amount = nil
+      end
+
+      if attributes.key?(:'final_amount')
+        self.final_amount = attributes[:'final_amount']
+      else
+        self.final_amount = nil
+      end
+
+      if attributes.key?(:'total_paid_amount')
+        self.total_paid_amount = attributes[:'total_paid_amount']
+      else
+        self.total_paid_amount = nil
+      end
+
+      if attributes.key?(:'discount_amount')
+        self.discount_amount = attributes[:'discount_amount']
+      else
+        self.discount_amount = nil
+      end
+
+      if attributes.key?(:'tax_amount')
+        self.tax_amount = attributes[:'tax_amount']
+      else
+        self.tax_amount = nil
+      end
+
+      if attributes.key?(:'shipping_amount')
+        self.shipping_amount = attributes[:'shipping_amount']
+      else
+        self.shipping_amount = nil
+      end
+
+      if attributes.key?(:'loyalty_amount')
+        self.loyalty_amount = attributes[:'loyalty_amount']
+      else
+        self.loyalty_amount = nil
+      end
+
+      if attributes.key?(:'callback_url')
+        self.callback_url = attributes[:'callback_url']
+      else
+        self.callback_url = nil
+      end
+
+      if attributes.key?(:'merchant')
+        self.merchant = attributes[:'merchant']
+      else
+        self.merchant = nil
+      end
+
+      if attributes.key?(:'items')
+        if (value = attributes[:'items']).is_a?(Array)
+          self.items = value
+        end
+      else
+        self.items = nil
+      end
+
+      if attributes.key?(:'source_address')
+        self.source_address = attributes[:'source_address']
+      else
+        self.source_address = nil
+      end
+
+      if attributes.key?(:'destination_address')
+        self.destination_address = attributes[:'destination_address']
+      else
+        self.destination_address = nil
+      end
+
+      if attributes.key?(:'selected_shipping_method')
+        self.selected_shipping_method = attributes[:'selected_shipping_method']
+      else
+        self.selected_shipping_method = nil
+      end
+
+      if attributes.key?(:'shipping_selected_at')
+        self.shipping_selected_at = attributes[:'shipping_selected_at']
+      else
+        self.shipping_selected_at = nil
+      end
+
+      if attributes.key?(:'address_selected_at')
+        self.address_selected_at = attributes[:'address_selected_at']
+      else
+        self.address_selected_at = nil
+      end
+
+      if attributes.key?(:'packing_amount')
+        self.packing_amount = attributes[:'packing_amount']
+      else
+        self.packing_amount = nil
+      end
+
+      if attributes.key?(:'packing_selected_at')
+        self.packing_selected_at = attributes[:'packing_selected_at']
+      else
+        self.packing_selected_at = nil
+      end
+
+      if attributes.key?(:'selected_packing')
+        self.selected_packing = attributes[:'selected_packing']
+      else
+        self.selected_packing = nil
+      end
+
+      if attributes.key?(:'can_select_packing')
+        self.can_select_packing = attributes[:'can_select_packing']
+      else
+        self.can_select_packing = nil
+      end
+
+      if attributes.key?(:'can_select_shipping')
+        self.can_select_shipping = attributes[:'can_select_shipping']
+      else
+        self.can_select_shipping = nil
+      end
+
+      if attributes.key?(:'can_select_address')
+        self.can_select_address = attributes[:'can_select_address']
+      else
+        self.can_select_address = nil
+      end
+
+      if attributes.key?(:'can_proceed_to_payment')
+        self.can_proceed_to_payment = attributes[:'can_proceed_to_payment']
+      else
+        self.can_proceed_to_payment = nil
+      end
+
+      if attributes.key?(:'is_paid')
+        self.is_paid = attributes[:'is_paid']
+      else
+        self.is_paid = nil
+      end
+
+      if attributes.key?(:'user')
+        self.user = attributes[:'user']
+      else
+        self.user = nil
+      end
+
+      if attributes.key?(:'payment')
+        self.payment = attributes[:'payment']
+      else
+        self.payment = nil
+      end
+
+      if attributes.key?(:'preparation_time')
+        self.preparation_time = attributes[:'preparation_time']
+      else
+        self.preparation_time = nil
+      end
+
+      if attributes.key?(:'weight')
+        self.weight = attributes[:'weight']
+      else
+        self.weight = nil
+      end
+
+      if attributes.key?(:'selected_shipping_data')
+        if (value = attributes[:'selected_shipping_data']).is_a?(Hash)
+          self.selected_shipping_data = value
+        end
+      else
+        self.selected_shipping_data = nil
+      end
+
+      if attributes.key?(:'reference_code')
+        self.reference_code = attributes[:'reference_code']
+      else
+        self.reference_code = nil
+      end
+
+      if attributes.key?(:'promotion_discount_amount')
+        self.promotion_discount_amount = attributes[:'promotion_discount_amount']
+      else
+        self.promotion_discount_amount = nil
+      end
+
+      if attributes.key?(:'promotion_data')
+        if (value = attributes[:'promotion_data']).is_a?(Hash)
+          self.promotion_data = value
+        end
+      else
+        self.promotion_data = nil
+      end
+
+      if attributes.key?(:'digipay_markup_amount')
+        self.digipay_markup_amount = attributes[:'digipay_markup_amount']
+      else
+        self.digipay_markup_amount = nil
+      end
+
+      if attributes.key?(:'markup_commission_percentage')
+        self.markup_commission_percentage = attributes[:'markup_commission_percentage']
+      else
+        self.markup_commission_percentage = nil
+      end
+
+      if attributes.key?(:'previous_status')
+        self.previous_status = attributes[:'previous_status']
+      else
+        self.previous_status = nil
+      end
+
+      if attributes.key?(:'previous_status_display')
+        self.previous_status_display = attributes[:'previous_status_display']
+      else
+        self.previous_status_display = nil
+      end
+    end
+
+    # Show invalid properties with the reasons. Usually used together with valid?
+    # @return Array for valid properties with the reasons
+    def list_invalid_properties
+      warn '[DEPRECATED] the `list_invalid_properties` method is obsolete'
+      invalid_properties = Array.new
+      if @id.nil?
+        invalid_properties.push('invalid value for "id", id cannot be nil.')
+      end
+
+      if @created_at.nil?
+        invalid_properties.push('invalid value for "created_at", created_at cannot be nil.')
+      end
+
+      if @order_uuid.nil?
+        invalid_properties.push('invalid value for "order_uuid", order_uuid cannot be nil.')
+      end
+
+      if @merchant_order_id.nil?
+        invalid_properties.push('invalid value for "merchant_order_id", merchant_order_id cannot be nil.')
+      end
+
+      if @status.nil?
+        invalid_properties.push('invalid value for "status", status cannot be nil.')
+      end
+
+      if @status_display.nil?
+        invalid_properties.push('invalid value for "status_display", status_display cannot be nil.')
+      end
+
+      if @main_amount.nil?
+        invalid_properties.push('invalid value for "main_amount", main_amount cannot be nil.')
+      end
+
+      if @final_amount.nil?
+        invalid_properties.push('invalid value for "final_amount", final_amount cannot be nil.')
+      end
+
+      if @total_paid_amount.nil?
+        invalid_properties.push('invalid value for "total_paid_amount", total_paid_amount cannot be nil.')
+      end
+
+      if @discount_amount.nil?
+        invalid_properties.push('invalid value for "discount_amount", discount_amount cannot be nil.')
+      end
+
+      if @tax_amount.nil?
+        invalid_properties.push('invalid value for "tax_amount", tax_amount cannot be nil.')
+      end
+
+      if @shipping_amount.nil?
+        invalid_properties.push('invalid value for "shipping_amount", shipping_amount cannot be nil.')
+      end
+
+      if @loyalty_amount.nil?
+        invalid_properties.push('invalid value for "loyalty_amount", loyalty_amount cannot be nil.')
+      end
+
+      if @callback_url.nil?
+        invalid_properties.push('invalid value for "callback_url", callback_url cannot be nil.')
+      end
+
+      if @merchant.nil?
+        invalid_properties.push('invalid value for "merchant", merchant cannot be nil.')
+      end
+
+      if @items.nil?
+        invalid_properties.push('invalid value for "items", items cannot be nil.')
+      end
+
+      if @selected_shipping_method.nil?
+        invalid_properties.push('invalid value for "selected_shipping_method", selected_shipping_method cannot be nil.')
+      end
+
+      if @packing_amount.nil?
+        invalid_properties.push('invalid value for "packing_amount", packing_amount cannot be nil.')
+      end
+
+      if @selected_packing.nil?
+        invalid_properties.push('invalid value for "selected_packing", selected_packing cannot be nil.')
+      end
+
+      if @can_select_packing.nil?
+        invalid_properties.push('invalid value for "can_select_packing", can_select_packing cannot be nil.')
+      end
+
+      if @can_select_shipping.nil?
+        invalid_properties.push('invalid value for "can_select_shipping", can_select_shipping cannot be nil.')
+      end
+
+      if @can_select_address.nil?
+        invalid_properties.push('invalid value for "can_select_address", can_select_address cannot be nil.')
+      end
+
+      if @can_proceed_to_payment.nil?
+        invalid_properties.push('invalid value for "can_proceed_to_payment", can_proceed_to_payment cannot be nil.')
+      end
+
+      if @is_paid.nil?
+        invalid_properties.push('invalid value for "is_paid", is_paid cannot be nil.')
+      end
+
+      if @user.nil?
+        invalid_properties.push('invalid value for "user", user cannot be nil.')
+      end
+
+      if @payment.nil?
+        invalid_properties.push('invalid value for "payment", payment cannot be nil.')
+      end
+
+      if @preparation_time.nil?
+        invalid_properties.push('invalid value for "preparation_time", preparation_time cannot be nil.')
+      end
+
+      if @weight.nil?
+        invalid_properties.push('invalid value for "weight", weight cannot be nil.')
+      end
+
+      if @selected_shipping_data.nil?
+        invalid_properties.push('invalid value for "selected_shipping_data", selected_shipping_data cannot be nil.')
+      end
+
+      if @reference_code.nil?
+        invalid_properties.push('invalid value for "reference_code", reference_code cannot be nil.')
+      end
+
+      if @promotion_discount_amount.nil?
+        invalid_properties.push('invalid value for "promotion_discount_amount", promotion_discount_amount cannot be nil.')
+      end
+
+      if @promotion_data.nil?
+        invalid_properties.push('invalid value for "promotion_data", promotion_data cannot be nil.')
+      end
+
+      if @digipay_markup_amount.nil?
+        invalid_properties.push('invalid value for "digipay_markup_amount", digipay_markup_amount cannot be nil.')
+      end
+
+      if @markup_commission_percentage.nil?
+        invalid_properties.push('invalid value for "markup_commission_percentage", markup_commission_percentage cannot be nil.')
+      end
+
+      if @previous_status_display.nil?
+        invalid_properties.push('invalid value for "previous_status_display", previous_status_display cannot be nil.')
+      end
+
+      invalid_properties
+    end
+
+    # Check to see if the all the properties in the model are valid
+    # @return true if the model is valid
+    def valid?
+      warn '[DEPRECATED] the `valid?` method is obsolete'
+      return false if @id.nil?
+      return false if @created_at.nil?
+      return false if @order_uuid.nil?
+      return false if @merchant_order_id.nil?
+      return false if @status.nil?
+      return false if @status_display.nil?
+      return false if @main_amount.nil?
+      return false if @final_amount.nil?
+      return false if @total_paid_amount.nil?
+      return false if @discount_amount.nil?
+      return false if @tax_amount.nil?
+      return false if @shipping_amount.nil?
+      return false if @loyalty_amount.nil?
+      return false if @callback_url.nil?
+      return false if @merchant.nil?
+      return false if @items.nil?
+      return false if @selected_shipping_method.nil?
+      return false if @packing_amount.nil?
+      return false if @selected_packing.nil?
+      return false if @can_select_packing.nil?
+      return false if @can_select_shipping.nil?
+      return false if @can_select_address.nil?
+      return false if @can_proceed_to_payment.nil?
+      return false if @is_paid.nil?
+      return false if @user.nil?
+      return false if @payment.nil?
+      return false if @preparation_time.nil?
+      return false if @weight.nil?
+      return false if @selected_shipping_data.nil?
+      return false if @reference_code.nil?
+      return false if @promotion_discount_amount.nil?
+      return false if @promotion_data.nil?
+      return false if @digipay_markup_amount.nil?
+      return false if @markup_commission_percentage.nil?
+      return false if @previous_status_display.nil?
+      true
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] id Value to be assigned
+    def id=(id)
+      if id.nil?
+        fail ArgumentError, 'id cannot be nil'
+      end
+
+      @id = id
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] created_at Value to be assigned
+    def created_at=(created_at)
+      if created_at.nil?
+        fail ArgumentError, 'created_at cannot be nil'
+      end
+
+      @created_at = created_at
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] order_uuid Value to be assigned
+    def order_uuid=(order_uuid)
+      if order_uuid.nil?
+        fail ArgumentError, 'order_uuid cannot be nil'
+      end
+
+      @order_uuid = order_uuid
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] merchant_order_id Value to be assigned
+    def merchant_order_id=(merchant_order_id)
+      if merchant_order_id.nil?
+        fail ArgumentError, 'merchant_order_id cannot be nil'
+      end
+
+      @merchant_order_id = merchant_order_id
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] status Value to be assigned
+    def status=(status)
+      if status.nil?
+        fail ArgumentError, 'status cannot be nil'
+      end
+
+      @status = status
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] status_display Value to be assigned
+    def status_display=(status_display)
+      if status_display.nil?
+        fail ArgumentError, 'status_display cannot be nil'
+      end
+
+      @status_display = status_display
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] main_amount Value to be assigned
+    def main_amount=(main_amount)
+      if main_amount.nil?
+        fail ArgumentError, 'main_amount cannot be nil'
+      end
+
+      @main_amount = main_amount
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] final_amount Value to be assigned
+    def final_amount=(final_amount)
+      if final_amount.nil?
+        fail ArgumentError, 'final_amount cannot be nil'
+      end
+
+      @final_amount = final_amount
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] total_paid_amount Value to be assigned
+    def total_paid_amount=(total_paid_amount)
+      if total_paid_amount.nil?
+        fail ArgumentError, 'total_paid_amount cannot be nil'
+      end
+
+      @total_paid_amount = total_paid_amount
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] discount_amount Value to be assigned
+    def discount_amount=(discount_amount)
+      if discount_amount.nil?
+        fail ArgumentError, 'discount_amount cannot be nil'
+      end
+
+      @discount_amount = discount_amount
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] tax_amount Value to be assigned
+    def tax_amount=(tax_amount)
+      if tax_amount.nil?
+        fail ArgumentError, 'tax_amount cannot be nil'
+      end
+
+      @tax_amount = tax_amount
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] shipping_amount Value to be assigned
+    def shipping_amount=(shipping_amount)
+      if shipping_amount.nil?
+        fail ArgumentError, 'shipping_amount cannot be nil'
+      end
+
+      @shipping_amount = shipping_amount
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] loyalty_amount Value to be assigned
+    def loyalty_amount=(loyalty_amount)
+      if loyalty_amount.nil?
+        fail ArgumentError, 'loyalty_amount cannot be nil'
+      end
+
+      @loyalty_amount = loyalty_amount
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] callback_url Value to be assigned
+    def callback_url=(callback_url)
+      if callback_url.nil?
+        fail ArgumentError, 'callback_url cannot be nil'
+      end
+
+      @callback_url = callback_url
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] merchant Value to be assigned
+    def merchant=(merchant)
+      if merchant.nil?
+        fail ArgumentError, 'merchant cannot be nil'
+      end
+
+      @merchant = merchant
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] items Value to be assigned
+    def items=(items)
+      if items.nil?
+        fail ArgumentError, 'items cannot be nil'
+      end
+
+      @items = items
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] selected_shipping_method Value to be assigned
+    def selected_shipping_method=(selected_shipping_method)
+      if selected_shipping_method.nil?
+        fail ArgumentError, 'selected_shipping_method cannot be nil'
+      end
+
+      @selected_shipping_method = selected_shipping_method
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] packing_amount Value to be assigned
+    def packing_amount=(packing_amount)
+      if packing_amount.nil?
+        fail ArgumentError, 'packing_amount cannot be nil'
+      end
+
+      @packing_amount = packing_amount
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] selected_packing Value to be assigned
+    def selected_packing=(selected_packing)
+      if selected_packing.nil?
+        fail ArgumentError, 'selected_packing cannot be nil'
+      end
+
+      @selected_packing = selected_packing
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] can_select_packing Value to be assigned
+    def can_select_packing=(can_select_packing)
+      if can_select_packing.nil?
+        fail ArgumentError, 'can_select_packing cannot be nil'
+      end
+
+      @can_select_packing = can_select_packing
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] can_select_shipping Value to be assigned
+    def can_select_shipping=(can_select_shipping)
+      if can_select_shipping.nil?
+        fail ArgumentError, 'can_select_shipping cannot be nil'
+      end
+
+      @can_select_shipping = can_select_shipping
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] can_select_address Value to be assigned
+    def can_select_address=(can_select_address)
+      if can_select_address.nil?
+        fail ArgumentError, 'can_select_address cannot be nil'
+      end
+
+      @can_select_address = can_select_address
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] can_proceed_to_payment Value to be assigned
+    def can_proceed_to_payment=(can_proceed_to_payment)
+      if can_proceed_to_payment.nil?
+        fail ArgumentError, 'can_proceed_to_payment cannot be nil'
+      end
+
+      @can_proceed_to_payment = can_proceed_to_payment
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] is_paid Value to be assigned
+    def is_paid=(is_paid)
+      if is_paid.nil?
+        fail ArgumentError, 'is_paid cannot be nil'
+      end
+
+      @is_paid = is_paid
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] user Value to be assigned
+    def user=(user)
+      if user.nil?
+        fail ArgumentError, 'user cannot be nil'
+      end
+
+      @user = user
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] payment Value to be assigned
+    def payment=(payment)
+      if payment.nil?
+        fail ArgumentError, 'payment cannot be nil'
+      end
+
+      @payment = payment
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] preparation_time Value to be assigned
+    def preparation_time=(preparation_time)
+      if preparation_time.nil?
+        fail ArgumentError, 'preparation_time cannot be nil'
+      end
+
+      @preparation_time = preparation_time
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] weight Value to be assigned
+    def weight=(weight)
+      if weight.nil?
+        fail ArgumentError, 'weight cannot be nil'
+      end
+
+      @weight = weight
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] selected_shipping_data Value to be assigned
+    def selected_shipping_data=(selected_shipping_data)
+      if selected_shipping_data.nil?
+        fail ArgumentError, 'selected_shipping_data cannot be nil'
+      end
+
+      @selected_shipping_data = selected_shipping_data
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] reference_code Value to be assigned
+    def reference_code=(reference_code)
+      if reference_code.nil?
+        fail ArgumentError, 'reference_code cannot be nil'
+      end
+
+      @reference_code = reference_code
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] promotion_discount_amount Value to be assigned
+    def promotion_discount_amount=(promotion_discount_amount)
+      if promotion_discount_amount.nil?
+        fail ArgumentError, 'promotion_discount_amount cannot be nil'
+      end
+
+      @promotion_discount_amount = promotion_discount_amount
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] promotion_data Value to be assigned
+    def promotion_data=(promotion_data)
+      if promotion_data.nil?
+        fail ArgumentError, 'promotion_data cannot be nil'
+      end
+
+      @promotion_data = promotion_data
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] digipay_markup_amount Value to be assigned
+    def digipay_markup_amount=(digipay_markup_amount)
+      if digipay_markup_amount.nil?
+        fail ArgumentError, 'digipay_markup_amount cannot be nil'
+      end
+
+      @digipay_markup_amount = digipay_markup_amount
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] markup_commission_percentage Value to be assigned
+    def markup_commission_percentage=(markup_commission_percentage)
+      if markup_commission_percentage.nil?
+        fail ArgumentError, 'markup_commission_percentage cannot be nil'
+      end
+
+      @markup_commission_percentage = markup_commission_percentage
+    end
+
+    # Custom attribute writer method with validation
+    # @param [Object] previous_status_display Value to be assigned
+    def previous_status_display=(previous_status_display)
+      if previous_status_display.nil?
+        fail ArgumentError, 'previous_status_display cannot be nil'
+      end
+
+      @previous_status_display = previous_status_display
+    end
+
+    # Checks equality by comparing each attribute.
+    # @param [Object] Object to be compared
+    def ==(o)
+      return true if self.equal?(o)
+      self.class == o.class &&
+          id == o.id &&
+          created_at == o.created_at &&
+          order_uuid == o.order_uuid &&
+          reservation_expired_at == o.reservation_expired_at &&
+          merchant_order_id == o.merchant_order_id &&
+          status == o.status &&
+          status_display == o.status_display &&
+          main_amount == o.main_amount &&
+          final_amount == o.final_amount &&
+          total_paid_amount == o.total_paid_amount &&
+          discount_amount == o.discount_amount &&
+          tax_amount == o.tax_amount &&
+          shipping_amount == o.shipping_amount &&
+          loyalty_amount == o.loyalty_amount &&
+          callback_url == o.callback_url &&
+          merchant == o.merchant &&
+          items == o.items &&
+          source_address == o.source_address &&
+          destination_address == o.destination_address &&
+          selected_shipping_method == o.selected_shipping_method &&
+          shipping_selected_at == o.shipping_selected_at &&
+          address_selected_at == o.address_selected_at &&
+          packing_amount == o.packing_amount &&
+          packing_selected_at == o.packing_selected_at &&
+          selected_packing == o.selected_packing &&
+          can_select_packing == o.can_select_packing &&
+          can_select_shipping == o.can_select_shipping &&
+          can_select_address == o.can_select_address &&
+          can_proceed_to_payment == o.can_proceed_to_payment &&
+          is_paid == o.is_paid &&
+          user == o.user &&
+          payment == o.payment &&
+          preparation_time == o.preparation_time &&
+          weight == o.weight &&
+          selected_shipping_data == o.selected_shipping_data &&
+          reference_code == o.reference_code &&
+          promotion_discount_amount == o.promotion_discount_amount &&
+          promotion_data == o.promotion_data &&
+          digipay_markup_amount == o.digipay_markup_amount &&
+          markup_commission_percentage == o.markup_commission_percentage &&
+          previous_status == o.previous_status &&
+          previous_status_display == o.previous_status_display
+    end
+
+    # @see the `==` method
+    # @param [Object] Object to be compared
+    def eql?(o)
+      self == o
+    end
+
+    # Calculates hash code according to all attributes.
+    # @return [Integer] Hash code
+    def hash
+      [id, created_at, order_uuid, reservation_expired_at, merchant_order_id, status, status_display, main_amount, final_amount, total_paid_amount, discount_amount, tax_amount, shipping_amount, loyalty_amount, callback_url, merchant, items, source_address, destination_address, selected_shipping_method, shipping_selected_at, address_selected_at, packing_amount, packing_selected_at, selected_packing, can_select_packing, can_select_shipping, can_select_address, can_proceed_to_payment, is_paid, user, payment, preparation_time, weight, selected_shipping_data, reference_code, promotion_discount_amount, promotion_data, digipay_markup_amount, markup_commission_percentage, previous_status, previous_status_display].hash
+    end
+
+    # Builds the object from hash
+    # @param [Hash] attributes Model attributes in the form of hash
+    # @return [Object] Returns the model itself
+    def self.build_from_hash(attributes)
+      return nil unless attributes.is_a?(Hash)
+      attributes = attributes.transform_keys(&:to_sym)
+      transformed_hash = {}
+      openapi_types.each_pair do |key, type|
+        if attributes.key?(attribute_map[key]) && attributes[attribute_map[key]].nil?
+          transformed_hash["#{key}"] = nil
+        elsif type =~ /\AArray<(.*)>/i
+          # check to ensure the input is an array given that the attribute
+          # is documented as an array but the input is not
+          if attributes[attribute_map[key]].is_a?(Array)
+            transformed_hash["#{key}"] = attributes[attribute_map[key]].map { |v| _deserialize($1, v) }
+          end
+        elsif !attributes[attribute_map[key]].nil?
+          transformed_hash["#{key}"] = _deserialize(type, attributes[attribute_map[key]])
+        end
+      end
+      new(transformed_hash)
+    end
+
+    # Returns the object in the form of hash
+    # @return [Hash] Returns the object in the form of hash
+    def to_hash
+      hash = {}
+      self.class.attribute_map.each_pair do |attr, param|
+        value = self.send(attr)
+        if value.nil?
+          is_nullable = self.class.openapi_nullable.include?(attr)
+          next if !is_nullable || (is_nullable && !instance_variable_defined?(:"@#{attr}"))
+        end
+
+        hash[param] = _to_hash(value)
+      end
+      hash
+    end
+
+  end
+
+end
